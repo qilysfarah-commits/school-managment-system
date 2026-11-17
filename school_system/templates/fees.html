@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>School Fees & Payment Tracking</h2>
+
+{% if role == 'admin' %}
+<div class="form-box">
+    <h3>Add Fee Record</h3>
+    <form method="POST" action="{{ url_for('add_fee') }}">
+        <select name="student_name" required>
+            <option value="">-- Select Student --</option>
+            {% for s in students %}
+            <option value="{{ s.name }}">{{ s.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="term" required>
+            <option value="Term 1">Term 1</option>
+            <option value="Term 2">Term 2</option>
+            <option value="Term 3">Term 3</option>
+        </select>
+        <input type="number" name="amount" placeholder="Total Amount" min="0" required>
+        <input type="number" name="paid" placeholder="Amount Paid" min="0" value="0">
+        <button type="submit">Add</button>
+    </form>
+</div>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Term</th>
+            <th>Total Amount</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Status</th>
+            {% if role == 'admin' %}<th>Action</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for f in fees %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ f.student_name }}</td>
+            <td>{{ f.term }}</td>
+            <td>${{ f.amount }}</td>
+            <td>${{ f.paid }}</td>
+            <td>${{ f.balance }}</td>
+            <td><span class="badge {{ 'badge-green' if f.status == 'Paid' else 'badge-red' }}">{{ f.status }}</span></td>
+            {% if role == 'admin' %}
+            <td><a href="{{ url_for('delete_fee', id=f._id) }}" class="delete" onclick="return confirm('Delete?')">Delete</a></td>
+            {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="8">No fee records found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

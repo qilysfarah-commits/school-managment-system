@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Student Attendance</h2>
+
+{% if role == 'admin' or role == 'teacher' %}
+<div class="form-box">
+    <h3>Mark Attendance</h3>
+    <form method="POST" action="{{ url_for('add_attendance') }}">
+        <select name="student_name" required onchange="document.querySelector('[name=student_id]').value=this.options[this.selectedIndex].dataset.id">
+            <option value="">-- Select Student --</option>
+            {% for s in students %}
+            <option value="{{ s.name }}" data-id="{{ s._id }}">{{ s.name }} ({{ s.student_id }})</option>
+            {% endfor %}
+        </select>
+        <input type="hidden" name="student_id" value="">
+        <input type="date" name="date" required>
+        <select name="status" required>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+        </select>
+        {% if role == 'teacher' %}
+        <input type="text" name="subject" value="{{ teacher_subject }}" readonly style="background:#f5f5f5;">
+        {% else %}
+        <input type="text" name="subject" placeholder="Subject (e.g., Mathematics)" required>
+        {% endif %}
+        <button type="submit">Save</button>
+    </form>
+</div>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Subject</th>
+            {% if role == 'admin' %}<th>Action</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in attendance %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ a.student_name }}</td>
+            <td>{{ a.date }}</td>
+            <td>
+                <span class="badge {{ 'badge-green' if a.status == 'Present' else 'badge-red' }}">
+                    {{ a.status }}
+                </span>
+            </td>
+            <td>{{ a.subject }}</td>
+            {% if role == 'admin' %}
+            <td><a href="{{ url_for('delete_attendance', id=a._id) }}" class="delete" onclick="return confirm('Delete?')">Delete</a></td>
+            {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="6">No attendance records found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
