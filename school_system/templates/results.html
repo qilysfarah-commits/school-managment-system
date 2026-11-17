@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Examination Results & Grades</h2>
+
+{% if role == 'admin' %}
+<div class="form-box">
+    <h3>Add Result</h3>
+    <form method="POST" action="{{ url_for('add_result') }}">
+        <select name="student_name" required>
+            <option value="">-- Select Student --</option>
+            {% for s in students %}
+            <option value="{{ s.name }}">{{ s.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="subject" placeholder="Subject" required>
+        <input type="number" name="score" placeholder="Score (0-100)" min="0" max="100" required>
+        <select name="term" required>
+            <option value="Term 1">Term 1</option>
+            <option value="Term 2">Term 2</option>
+            <option value="Term 3">Term 3</option>
+        </select>
+        <button type="submit">Add Result</button>
+    </form>
+</div>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Subject</th>
+            <th>Score</th>
+            <th>Grade</th>
+            <th>Term</th>
+            {% if role == 'admin' %}<th>Action</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in results %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ r.student_name }}</td>
+            <td>{{ r.subject }}</td>
+            <td>{{ r.score }}</td>
+            <td><span class="badge badge-blue">{{ r.grade }}</span></td>
+            <td>{{ r.term }}</td>
+            {% if role == 'admin' %}
+            <td><a href="{{ url_for('delete_result', id=r._id) }}" class="delete" onclick="return confirm('Delete?')">Delete</a></td>
+            {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No results found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="margin-top:16px; background:#fff; padding:14px 20px; border-radius:8px; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <b>Grading Scale:</b> &nbsp;
+    A+ (90-100) &nbsp;|&nbsp; A (80-89) &nbsp;|&nbsp; B (70-79) &nbsp;|&nbsp; C (60-69) &nbsp;|&nbsp; D (50-59) &nbsp;|&nbsp; F (below 50)
+</div>
+{% endblock %}

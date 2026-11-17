@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>School Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% if session.username %}
+    <nav>
+        <span class="brand"><img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width:30px; height:30px; margin-right:8px; vertical-align:middle;"> School System</span>
+        {% if session.role == 'admin' %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('view_students') }}">Students</a>
+        <a href="{{ url_for('view_teachers') }}">Teachers</a>
+        <a href="{{ url_for('view_classes') }}">Classes</a>
+        <a href="{{ url_for('view_attendance') }}">Attendance</a>
+        <a href="{{ url_for('view_results') }}">Results</a>
+        <a href="{{ url_for('view_fees') }}">Fees</a>
+        <a href="{{ url_for('view_reports') }}">Reports</a>
+        <a href="{{ url_for('view_users') }}">Users</a>
+        <a href="{{ url_for('approve_students') }}">Approve Students</a>
+        {% elif session.role == 'teacher' %}
+        <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('view_results') }}">Results</a>
+        <a href="{{ url_for('view_attendance') }}">Attendance</a>
+        <a href="{{ url_for('view_students') }}">Students</a>
+        {% elif session.role == 'student' %}
+        <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('view_results') }}">My Results</a>
+        <a href="{{ url_for('view_fees') }}">My Fees</a>
+        {% endif %}
+        <span class="user-info">Logged in as <b>{{ session.username }}</b> ({{ session.role }})</span>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </nav>
+    {% endif %}
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert {{ 'alert-success' if category == 'success' else 'alert-error' if category == 'error' else '' }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="text-align:center; margin-bottom:30px;">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="School Logo" style="width:80px; height:80px; object-fit:contain;">
+</div>
+<h2>Teacher Dashboard</h2>
+<p style="margin-bottom:20px">Welcome, <b>{{ teacher.name }}</b> &nbsp;|&nbsp; Subject: <b>{{ teacher_subject }}</b></p>
+
+<div class="cards">
+    <div class="card">
+        <h3>Total Students</h3>
+        <p class="count">{{ students|length }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Results</h3>
+        <p class="count">{{ results|length }}</p>
+    </div>
+    <div class="card">
+        <h3>Your Subject</h3>
+        <p class="count" style="font-size:24px">{{ teacher_subject }}</p>
+    </div>
+</div>
+
+<div class="report-section">
+    <h3>📝 Add Student Results ({{ teacher_subject }})</h3>
+    <div class="form-box">
+        <form method="POST" action="{{ url_for('add_result') }}">
+            <select name="student_name" required>
+                <option value="">Select Student</option>
+                {% for student in students %}
+                <option value="{{ student.name }}">{{ student.name }} ({{ student.student_id }})</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="subject" value="{{ teacher_subject }}" readonly style="background:#f5f5f5;">
+            <input type="number" name="score" placeholder="Score (0-100)" required min="0" max="100">
+            <input type="text" name="term" placeholder="Term (e.g., Term 1)" required>
+            <button type="submit">Add Result</button>
+        </form>
+    </div>
+</div>
+
+<div class="report-section">
+    <h3>📊 Recent Results ({{ teacher_subject }})</h3>
+    {% if results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Subject</th>
+                <th>Score</th>
+                <th>Grade</th>
+                <th>Term</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.student_name }}</td>
+                <td>{{ result.subject }}</td>
+                <td>{{ result.score }}</td>
+                <td><span class="badge badge-{{ 'green' if result.grade in ['A+', 'A', 'B'] else 'red' if result.grade == 'F' else 'blue' }}">{{ result.grade }}</span></td>
+                <td>{{ result.term }}</td>
+                <td><a href="{{ url_for('delete_result', id=result._id) }}" class="delete">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="padding:20px; background:#f5f5f5; border-radius:8px;">No results recorded yet for {{ teacher_subject }}.</p>
+    {% endif %}
+</div>
+
+<div class="report-section">
+    <h3>👨‍🎓 Student List</h3>
+    {% if students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Grade</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.student_id }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.grade }}</td>
+                <td>{{ student.age }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="padding:20px; background:#f5f5f5; border-radius:8px;">No students found.</p>
+    {% endif %}
+</div>
+{% endblock %}

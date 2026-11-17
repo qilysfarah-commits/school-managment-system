@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Classes & Subjects</h2>
+
+{% if role == 'admin' %}
+<div class="form-box">
+    <h3>Add Class</h3>
+    <form method="POST" action="{{ url_for('add_class') }}">
+        <input type="text" name="name" placeholder="Class Name (e.g. Grade 10A)" required>
+        <button type="submit">Add Class</button>
+    </form>
+</div>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Class Name</th>
+            {% if role == 'admin' %}<th>Action</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in classes %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ c.name }}</td>
+            {% if role == 'admin' %}
+            <td><a href="{{ url_for('delete_class', id=c._id) }}" class="delete" onclick="return confirm('Delete this class?')">Delete</a></td>
+            {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="3">No classes found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
